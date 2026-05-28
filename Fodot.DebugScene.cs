@@ -1,8 +1,8 @@
+#if DEBUG
+
 using Godot.Common;
 
 namespace Godot.FodotPlugin;
-
-#if TOOLS
 
 public partial class FodotMain
 {

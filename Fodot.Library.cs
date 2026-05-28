@@ -1,3 +1,5 @@
+#if DEBUG
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,8 +8,6 @@ using Fodot.Generator;
 using Godot.Collections;
 
 namespace Godot.FodotPlugin;
-
-#if TOOLS
 
 public partial class FodotMain
 {

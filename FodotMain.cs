@@ -1,15 +1,12 @@
+#if DEBUG
+
 using Godot.Common;
 
 namespace Godot.FodotPlugin;
 
 [Tool]
-#if TOOLS
 public partial class FodotMain : EditorPlugin, ISerializationListener
-#else
-public partial class FodotMain : EditorPlugin
-#endif
 {
-#if TOOLS    
     
     private static string MainSceneKey => FodotEditor.MainSceneKey;
     private const string LibraryKey = "fodot/general/library_schedule_time";

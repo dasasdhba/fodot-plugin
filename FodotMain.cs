@@ -1,6 +1,6 @@
 #if DEBUG
 
-using Godot.Common;
+using Godot.Editor;
 
 namespace Godot.FodotPlugin;
 

@@ -8,6 +8,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\library\Fodot.Generator\Fodot.Generator.fsproj" Condition="'$(Configuration)' == 'Debug'" />
-        <ProjectReference Include="..\..\library\Godot.Common\Godot.Common.csproj" />
+        <ProjectReference Include="..\..\library\Godot.Editor\Godot.Editor.csproj" />
     </ItemGroup>
 </Project>

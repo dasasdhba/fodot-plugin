@@ -4,7 +4,7 @@ class_name Library
 
 @export_category("Library")
 @export var lib_name : String = ""
-@export var lib : Dictionary[String, Variant] = {}
+@export_custom(PROPERTY_HINT_DICTIONARY_TYPE, "String;Variant") var lib : Dictionary[String, Variant] = {}
 
 func get_lib_name():
 	if lib_name == "":

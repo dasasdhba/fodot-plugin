@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\library\Fodot.Generator\Fodot.Generator.fsproj" Condition="'$(Configuration)' == 'Debug'" />
+        <ProjectReference Include="..\..\library\Fodot.GdYaml\Fodot.GdYaml.fsproj" Condition="'$(Configuration)' == 'Debug'" />
         <ProjectReference Include="..\..\library\Godot.Editor\Godot.Editor.csproj" />
     </ItemGroup>
 </Project>

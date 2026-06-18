@@ -125,7 +125,7 @@ public partial class FodotMain
                 
                 var fullCode = 
                     $"namespace {name}.{data.CodeFileName}\n\n" +
-                    "open Fodot.Core\n" +
+                    "open Fodot\n" +
                     "open Godot\n\n" +
                     text;
             

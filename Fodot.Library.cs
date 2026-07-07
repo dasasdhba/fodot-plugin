@@ -26,6 +26,7 @@ public partial class FodotMain
     private void LoadLibrary(string path)
     {
         var dir = DirAccess.Open(path);
+        if (dir is null) return;
         foreach (var f in dir.GetFiles().Select(u => path + "/" + u))
         {
             if (f.EndsWith(".gd.yaml"))

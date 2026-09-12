@@ -1,5 +1,6 @@
 #if DEBUG
 
+using System;
 using Godot.Editor;
 
 namespace Godot.MoonPlugin;
@@ -9,6 +10,8 @@ public partial class MoonMain : EditorPlugin, ISerializationListener
 {
 
     private static string MainSceneKey => MoonEditor.MainSceneKey;
+    private const string AssemblyListKey = "moon/general/assembly_list";
+    private const string AssemblyListCache = "res://.godot/moon_assembly_list";
     private const string LibraryKey = "moon/general/library_schedule_time";
     private const string BridgeKey = "Moon";
     private const string BridgeFile = "res://MoonEntry.cs";
@@ -19,6 +22,8 @@ public partial class MoonMain : EditorPlugin, ISerializationListener
     {
         Plugin.AddProjectSetting(MainSceneKey, "", Variant.Type.String,
             PropertyHint.File, "*.tscn,*.scn,*.res");
+        Plugin.AddProjectSetting(AssemblyListKey, new string[0],
+            Variant.Type.PackedStringArray);
         Plugin.AddProjectSetting(LibraryKey, 3.0, Variant.Type.Float,
             PropertyHint.Range, "0,60,0.5");
 
@@ -56,6 +61,22 @@ public partial class MoonMain : EditorPlugin, ISerializationListener
     {
         UpdateDebugScene();
         ProcessLib(delta);
+    }
+
+    private void ProcessAssemblyList()
+    {
+        if (!FileAccess.FileExists(AssemblyListCache)) return;
+
+        using var file = FileAccess.Open(AssemblyListCache, FileAccess.ModeFlags.Read);
+        if (file == null) return;
+
+        var assemblies = file.GetAsText()
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        ProjectSettings.SetSetting(AssemblyListKey, assemblies);
+        if (ProjectSettings.Save() == Error.Ok)
+        {
+            DirAccess.RemoveAbsolute(ProjectSettings.GlobalizePath(AssemblyListCache));
+        }
     }
 
 #endif    

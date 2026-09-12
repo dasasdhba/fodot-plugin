@@ -307,6 +307,7 @@ public partial class MoonMain
         if (_libTimer >= schedule)
         {
             _libTimer -= schedule;
+            ProcessAssemblyList();
             NotifyUpdateLibrary();
         }
     }

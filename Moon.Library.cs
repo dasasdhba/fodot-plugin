@@ -4,12 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Fodot.GdYaml;
 using Godot.Collections;
+using Moon;
 
-namespace Godot.FodotPlugin;
+namespace Godot.MoonPlugin;
 
-public partial class FodotMain
+public partial class MoonMain
 {
 
     private Array<string> _cachedUnlib = [];
@@ -52,15 +52,18 @@ public partial class FodotMain
             LoadLibrary(path + "/" + d);
         }
     }
-    
+
+
     private HashSet<string> GetPendingParents<T>(IDictionary<string, T> res, IDictionary<string, string> md5)
     {
         HashSet<string> result = [];
-        
+
+
         foreach (var k in res.Keys)
         {
             var parent = _cachedParents.GetValueOrDefault(k, "null");
-            
+
+
             if (!FileAccess.FileExists(k))
             {
                 res.Remove(k);
@@ -69,7 +72,8 @@ public partial class FodotMain
                 result.Add(parent);
                 continue;
             }
-            
+
+
             var md = FileAccess.GetMd5(k);
             if (!md5.TryGetValue(k, out string value) || md != value || !FileAccess.FileExists(parent))
             {
@@ -77,14 +81,16 @@ public partial class FodotMain
                 var path = ProjectSettings.GlobalizePath(k);
                 var dir = Path.GetDirectoryName(path);
                 var globalParent = Parser.findParentFsproj(dir);
-                var newParent = globalParent == "null" ? "null" : 
+                var newParent = globalParent == "null" ? "null" :
+
                     ProjectSettings.LocalizePath(globalParent);
                 _cachedParents[k] = newParent;
                 result.Add(parent);
                 result.Add(newParent);
             }
         }
-        
+
+
         return result;
     }
 
@@ -97,21 +103,25 @@ public partial class FodotMain
         public string ConsoleHintAdd { get; init; }
         public string ConsoleHintRemove { get; init; }
     }
-    
+
+
     private void UpdateWith<T>(UpdateData<T> data)
     {
         var parents = GetPendingParents(data.ResDict, data.Md5Dict);
-        
+
+
         foreach (var p in parents.Where(FileAccess.FileExists))
         {
             var files = data.ResDict.Keys
                 .Where(k => _cachedParents.GetValueOrDefault(k, "null") == p)
                 .ToArray();
-            
+
+
             var path = ProjectSettings.GlobalizePath(p);
             var name = Path.GetFileNameWithoutExtension(path);
             var file = Path.GetDirectoryName(path) + $"/{data.CodeFileName}.fs";
-            
+
+
             if (files.Length == 0)
             {
                 File.Delete(file);
@@ -123,13 +133,16 @@ public partial class FodotMain
                 var codes = files.Select(data.CodeGenerator)
                     .Where(c => c != "").ToArray();
                 var text = string.Join("\n\n", codes);
-                
-                var fullCode = 
+
+
+                var fullCode =
+
                     $"namespace {name}.{data.CodeFileName}\n\n" +
-                    "open Fodot\n" +
+                    "open Moon\n" +
                     "open Godot\n\n" +
                     text;
-            
+
+
                 File.WriteAllText(file, fullCode);
                 Parser.addCompileItem(data.CodeFileName, path);
                 LibPrint(string.Format(data.ConsoleHintAdd, codes.Length, name));
@@ -140,7 +153,8 @@ public partial class FodotMain
     private void UpdateYaml()
     {
         var scan = false;
-    
+
+
         var info = new UpdateData<string>
         {
             ResDict = _cachedYaml,
@@ -167,7 +181,8 @@ public partial class FodotMain
             ConsoleHintAdd = "Generated {0} binding type for {1}",
             ConsoleHintRemove = "Removed Bind.fs for {0}"
         };
-    
+
+
         UpdateWith(info);
 
         if (scan)
@@ -190,14 +205,17 @@ public partial class FodotMain
             ConsoleHintAdd = "Generated {0} library module for {1}",
             ConsoleHintRemove = "Removed Library.fs for {0}"
         };
-    
+
+
         UpdateWith(info);
     }
-    
+
+
     private bool _shouldLoadLib = true;
     private bool _shouldKillThread = false;
     private Semaphore _onUpdateLib = new();
-    
+
+
     private void NotifyUpdateLibrary() => _onUpdateLib.Post();
 
     private void ConnectToFilesystem()
@@ -211,27 +229,32 @@ public partial class FodotMain
         while (true)
         {
             if (_shouldKillThread) return;
-            
+
+
             if (_shouldLoadLib)
             {
                 _shouldLoadLib = false;
-                LoadLibrary("res://"); 
+                LoadLibrary("res://");
             }
-            
+
+
             UpdateYaml();
             UpdateLibrary();
-            
+
+
             _onUpdateLib.Wait();
         }
     }
-    
+
+
     private GodotThread _libThread;
-    private const string CacheCfg = "res://.godot/fodot_lib_cache.cfg";
+    private const string CacheCfg = "res://.godot/moon_lib_cache.cfg";
 
     private void LibInit()
     {
         EditorInterface.Singleton.GetResourceFilesystem().FilesystemChanged += ConnectToFilesystem;
-    
+
+
         var cfg = new ConfigFile();
         if (cfg.Load(CacheCfg) == Error.Ok)
         {
@@ -246,7 +269,8 @@ public partial class FodotMain
             _cachedParents = cfg.GetValue("cache", "parents", new Collections.Dictionary<string, string>())
                 .AsGodotDictionary<string, string>();
         }
-        
+
+
         _shouldKillThread = false;
         _shouldLoadLib = true;
         _libThread = new();
@@ -256,7 +280,8 @@ public partial class FodotMain
     private void LibExit()
     {
         EditorInterface.Singleton.GetResourceFilesystem().FilesystemChanged -= ConnectToFilesystem;
-    
+
+
         _shouldKillThread = true;
         NotifyUpdateLibrary();
         _libThread.WaitToFinish();
@@ -268,13 +293,15 @@ public partial class FodotMain
         cfg.SetValue("cache", "parents", _cachedParents);
         cfg.Save(CacheCfg);
     }
-    
+
+
     private double _libTimer = 0d;
 
     private void ProcessLib(double delta)
     {
         if (_shouldKillThread) return;
-    
+
+
         var schedule = LibraryScheduleTime;
         _libTimer += delta;
         if (_libTimer >= schedule)
@@ -283,7 +310,8 @@ public partial class FodotMain
             NotifyUpdateLibrary();
         }
     }
-    
+
+
 }
 
 #endif

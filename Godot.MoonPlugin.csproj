@@ -3,11 +3,11 @@
         <TargetFramework>$(TargetFrameworkVersion)</TargetFramework>
         <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'android' ">$(AndroidFrameworkVersion)</TargetFramework>
         <EnableDynamicLoading>true</EnableDynamicLoading>
-        <RootNamespace>Godot.FodotPlugin</RootNamespace>
+        <RootNamespace>Godot.MoonPlugin</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\library\Fodot.GdYaml\Fodot.GdYaml.fsproj" Condition="'$(Configuration)' == 'Debug'" />
+        <ProjectReference Include="..\..\library\Moon.GdYaml\Moon.GdYaml.fsproj" Condition="'$(Configuration)' == 'Debug'" />
         <ProjectReference Include="..\..\library\Godot.Editor\Godot.Editor.csproj" />
     </ItemGroup>
 </Project>

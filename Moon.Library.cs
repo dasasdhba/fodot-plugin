@@ -36,6 +36,7 @@ public partial class MoonMain
             else if (f.GetExtension() == "tres" && !_cachedLib.ContainsKey(f) && !_cachedUnlib.Contains(f))
             {
                 var res = GD.Load(f);
+                if (res is null) continue;
                 if (res.HasMethod("get_fs_content"))
                 {
                     _cachedLib.Add(f, res);
